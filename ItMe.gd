@@ -10,11 +10,11 @@ var vel = Vector3()
 
 func _input(event):
 	if event.type == InputEvent.MOUSE_MOTION:
-		yaw = fmod(yaw - event.relative_x * view_sensitivity, 360)
-		pitch = max(min(pitch - event.relative_y * view_sensitivity, 90), -90)
+		self.yaw = fmod(yaw - event.relative_x * view_sensitivity, 360)
+		self.pitch = max(min(pitch - event.relative_y * view_sensitivity, 90), -90)
 		
-		get_node("yaw").set_rotation(Vector3(0, deg2rad(yaw), 0))
-		get_node("yaw/Camera").set_rotation(Vector3(deg2rad(pitch), 0, 0))
+		self.get_node("yaw").set_rotation(Vector3(0, deg2rad(yaw), 0))
+		self.get_node("yaw/Camera").set_rotation(Vector3(deg2rad(pitch), 0, 0))
 		
 		print("yaw: ", yaw)
 		print("pitch: ", pitch)
@@ -32,17 +32,17 @@ func _fly(delta):
 		to += where[0]
 	to = to.normalized()
 	
-	var target = to * FLY_SPEED
-	vel = Vector3().linear_interpolate(target, FLY_ACCEL * delta)
-	var motion = vel * delta
+	var target = to * self.FLY_SPEED
+	self.vel = Vector3().linear_interpolate(target, self.FLY_ACCEL * delta)
+	var motion = self.vel * delta
 	motion = move(motion)
 	
 	var prevVel = vel
 	var attempts = 4
 	while(attempts and is_colliding()):
-		var n = get_collision_normal()
+		var n = self.get_collision_normal()
 		motion = n.slide(motion)
-		vel = n.slide(vel)
+		self.vel = n.slide(vel)
 		if(prevVel.dot(vel) > 0):
 			motion = move(motion)
 			if(motion.length() < 0.001):
@@ -50,7 +50,7 @@ func _fly(delta):
 		attempts -= 1
 
 func _fixed_process(delta):
-	_fly(delta)
+	self._fly(delta)
 
 func _ready():
 	# Called every time the node is added to the scene.
