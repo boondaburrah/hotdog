@@ -1,11 +1,12 @@
 extends KinematicBody
 
-# class member variables go here, for example:
-# var a = 2
-# var b = "textvar"
+const FLY_SPEED = 100
+const FLY_ACCEL = 4
+
 var view_sensitivity = 0.3
 var yaw = 0
 var pitch = 0
+var vel = Vector3()
 
 func _input(event):
 	if event.type == InputEvent.MOUSE_MOTION:
@@ -18,8 +19,38 @@ func _input(event):
 		print("yaw: ", yaw)
 		print("pitch: ", pitch)
 
+func _fly(delta):
+	var where = get_node("yaw/Camera").get_global_transform().basis
+	var to = Vector3()
+	if Input.is_action_pressed("move_fore"):
+		to -= where[2]
+	elif Input.is_action_pressed("move_aft"):
+		to += where[2]
+	if Input.is_action_pressed("move_port"):
+		to -= where[0]
+	elif Input.is_action_pressed("move_starboard"):
+		to += where[0]
+	to = to.normalized()
+	
+	var target = to * FLY_SPEED
+	vel = Vector3().linear_interpolate(target, FLY_ACCEL * delta)
+	var motion = vel * delta
+	motion = move(motion)
+	
+	var prevVel = vel
+	var attempts = 4
+	while(attempts and is_colliding()):
+		var n = get_collision_normal()
+		motion = n.slide(motion)
+		vel = n.slide(vel)
+		if(prevVel.dot(vel) > 0):
+			motion = move(motion)
+			if(motion.length() < 0.001):
+				break
+		attempts -= 1
+
 func _fixed_process(delta):
-	pass
+	_fly(delta)
 
 func _ready():
 	# Called every time the node is added to the scene.
