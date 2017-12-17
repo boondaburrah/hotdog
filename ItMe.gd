@@ -6,12 +6,14 @@ const WALK_MAX_SPEED = 15
 const ACCEL = 2
 const DECEL = 4
 const GRAVITY = -9.8 * 3
+const JUMP_SPEED = 3 * 3
 
 var view_sensitivity = 0.3
 var yaw = 0
 var pitch = 0
 var vel = Vector3()
 var isMoving = false
+var isFloored = false
 
 func _input(event):
 	if event.type == InputEvent.MOUSE_MOTION:
@@ -55,6 +57,7 @@ func _fly(delta):
 		attempts -= 1
 
 func _walk(delta):
+	var ray = self.get_node("floorsense")
 	var where = get_node("yaw/Camera").get_global_transform().basis
 	var to = Vector3()
 	if Input.is_action_pressed("move_fore"):
@@ -66,9 +69,19 @@ func _walk(delta):
 	elif Input.is_action_pressed("move_starboard"):
 		to += where[0]
 	self.isMoving = (to.length() > 0)
+	to.y = 0
 	to = to.normalized()
 	
-	self.vel.y += delta * self.GRAVITY
+	var isLand = ray.is_colliding()
+	
+	if !isFloored and isLand:
+		self.set_translation(ray.get_collision_point())
+		isFloored = true
+	elif isFloored and !isLand:
+		isFloored = false
+	
+	if !isFloored:
+		self.vel.y += delta * self.GRAVITY
 	
 	var target = to * self.WALK_MAX_SPEED
 	var accel = self.ACCEL if self.isMoving else self.DECEL
@@ -92,6 +105,9 @@ func _walk(delta):
 			if(motion.length() < 0.001):
 				break
 		attempts -= 1
+	
+	if Input.is_action_pressed("jump") and isFloored:
+		self.vel.y = self.JUMP_SPEED
 
 func _fixed_process(delta):
 	self._walk(delta)
