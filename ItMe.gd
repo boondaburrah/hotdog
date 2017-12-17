@@ -95,18 +95,14 @@ func _walk(delta):
 	motion = move(motion)
 	
 	var prevVel = vel
-	var attempts = 4
-	while(attempts and is_colliding()):
+	if((motion.length() > 0) and is_colliding()):
 		var n = self.get_collision_normal()
 		motion = n.slide(motion)
 		self.vel = n.slide(vel)
 		if(prevVel.dot(vel) > 0):
 			motion = move(motion)
-			if(motion.length() < 0.001):
-				break
-		attempts -= 1
 	
-	if Input.is_action_pressed("jump") and isFloored:
+	if isFloored and Input.is_action_pressed("jump"):
 		self.vel.y = self.JUMP_SPEED
 
 func _fixed_process(delta):
