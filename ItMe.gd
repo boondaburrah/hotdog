@@ -5,6 +5,7 @@ const FLY_ACCEL = 4
 const WALK_MAX_SPEED = 15
 const ACCEL = 2
 const DECEL = 4
+const GRAVITY = -9.8 * 3
 
 var view_sensitivity = 0.3
 var yaw = 0
@@ -66,6 +67,8 @@ func _walk(delta):
 		to += where[0]
 	self.isMoving = (to.length() > 0)
 	to = to.normalized()
+	
+	self.vel.y += delta * self.GRAVITY
 	
 	var target = to * self.WALK_MAX_SPEED
 	var accel = self.ACCEL if self.isMoving else self.DECEL
