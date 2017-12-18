@@ -15,6 +15,8 @@ var vel = Vector3()
 var isMoving = false
 var isFloored = false
 
+var playerstats
+
 func _input(event):
 	if event.type == InputEvent.MOUSE_MOTION:
 		self.yaw = fmod(yaw - event.relative_x * view_sensitivity, 360)
@@ -107,12 +109,14 @@ func _walk(delta):
 
 func _fixed_process(delta):
 	self._walk(delta)
+	# self.playerstats.playerLook = self.get_node("yaw").get_rotation()
+	self.playerstats.playerLook = Vector3(deg2rad(self.pitch), deg2rad(self.yaw), 0)
+	self.playerstats.playerPos = self.get_position_in_parent()
 
 func _ready():
-	# Called every time the node is added to the scene.
-	# Initialization here
-	set_fixed_process(true)
-	set_process_input(true)
+	self.set_fixed_process(true)
+	self.set_process_input(true)
+	self.playerstats = self.get_node("/root/playerstats")
 
 func _enter_tree():
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
