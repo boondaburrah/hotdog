@@ -111,7 +111,8 @@ func _fixed_process(delta):
 	self._walk(delta)
 	# self.playerstats.playerLook = self.get_node("yaw").get_rotation()
 	self.playerstats.playerLook = Vector3(deg2rad(self.pitch), deg2rad(self.yaw), 0)
-	self.playerstats.playerPos = self.get_position_in_parent()
+	self.playerstats.playerPos = self.get_global_transform().origin
+	#print("playerpos: ", self.playerstats.playerPos)
 
 func _ready():
 	self.set_fixed_process(true)
