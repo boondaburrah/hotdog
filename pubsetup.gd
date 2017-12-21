@@ -12,10 +12,14 @@ func _input(event):
 func _ready():
 	var portal_in = self.get_node("portin")
 	var portal_out= self.get_node("portout")
+	var portal_out_pos = portal_out.get_transform().origin - portal_in.get_transform().origin
+	var portal_out_rot = portal_out.get_rotation() - portal_in.get_rotation()
 	self.set_process_input(true)
 	self.get_node("PortalRoot").set_transform(portal_in.get_transform())
-	self.get_node("PortalRoot/outpoint").set_transform(
-		Transform(
-			# portal_in.get_transform().basis, # FIXME: not handling rotation portal exit
-			portal_out.get_transform().basis,
-			portal_in.get_transform().origin + portal_out.get_transform().origin))
+	self.get_node("PortalRoot/outpoint").set_translation(portal_out_pos)
+	self.get_node("PortalRoot/outpoint").set_rotation(portal_out_rot)
+	#self.get_node("PortalRoot/outpoint").set_transform(
+	#	Transform(
+	#		# portal_in.get_transform().basis, # FIXME: not handling rotation portal exit
+	#		portal_out.get_transform().basis,
+	#		portal_in.get_transform().origin + portal_out.get_transform().origin))
